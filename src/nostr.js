@@ -7,6 +7,19 @@ export function toHexString(byteArray) {
     }).join('');
 }
 
+
+// Convert Hex String to Uint8Array
+export function hexStringToUint8Array(hexString) {
+    if (hexString.length % 2 !== 0) {
+        throw new Error('Hex string must have an even length');
+    }
+    const byteArray = new Uint8Array(hexString.length / 2);
+    for (let i = 0; i < hexString.length; i += 2) {
+        byteArray[i / 2] = parseInt(hexString.substr(i, 2), 16);
+    }
+    return byteArray;
+}
+
 // Generate Nostr-compatible key pair
 export async function generateNostrKeyPair() {
     const privateKey = nobleSecp256k1.utils.randomPrivateKey(); // Generate a private key
@@ -25,7 +38,7 @@ export async function generateNostrKeyPair() {
 }
 // Derive Nostr-compatible public key from private key
 export async function derivePublicKey(privateKeyHex) {
-    const privateKey = new Uint8Array(Buffer.from(privateKeyHex, 'hex'));
+    const privateKey = hexStringToUint8Array(privateKeyHex);
     const publicKey = nobleSecp256k1.getPublicKey(privateKey, true); // Get compressed public key
     const publicKeyHex = toHexString(publicKey).slice(2);
 
