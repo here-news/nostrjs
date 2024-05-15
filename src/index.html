@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deterministic Bezier SVG Generator with Avatar</title>
+    <style>
+        #avatarDisplay {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: inline-block;
+            border: 1px solid black;
+        }
+        svg {
+            display: block; /* Remove extra space below SVG */
+        }
+    </style>
+</head>
+<body>
+    <button onclick="main()">Generate Key Pair and Draw SVG</button>
+    <button onclick="testDerivePublicKey()">Test Derive Public Key</button>
+    <div>
+        <strong>Public Key:</strong> <span id="publicKeyDisplay"></span><br>
+        <strong>Private Key:</strong> <span id="privateKeyDisplay"></span><br>
+        <strong>Derived Public Key:</strong> <span id="derivedPublicKeyDisplay"></span>
+    </div>
+    <div id="avatarDisplay"></div>
+    <svg id="bezierCanvas" width="800" height="600" style="border: 1px solid black; display: none;"></svg>
+    <script type="module">
+        import { generateNostrKeyPair, derivePublicKey } from 'https://cdn.jsdelivr.net/gh/here-news/nostrjs@v0.02/src/nostr.js';
+        import { generateSVG } from 'https://cdn.jsdelivr.net/gh/here-news/nostrjs@latest/src/key2svg.js';
+
+        window.nobleSecp256k1 = await import('https://cdn.jsdelivr.net/npm/noble-secp256k1@latest/+esm');
+
+        window.main = async function() {
+            const svg = document.getElementById('bezierCanvas');
+            svg.innerHTML = '';
+            const { privateKey, publicKey } = await generateNostrKeyPair();
+            generateSVG(publicKey, svg);
+
+            document.getElementById('publicKeyDisplay').textContent = publicKey;
+            document.getElementById('privateKeyDisplay').textContent = privateKey;
+
+            // Create avatar from SVG
+            const avatarDisplay = document.getElementById('avatarDisplay');
+            avatarDisplay.innerHTML = '';
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 30;
+                canvas.height = 30;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 30, 30);
+                avatarDisplay.appendChild(canvas);
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+        };
+
+        window.testDerivePublicKey = async function() {
+            const privateKey = document.getElementById('privateKeyDisplay').textContent;
+            if (privateKey) {
+                const derivedPublicKey = await derivePublicKey(privateKey);
+                document.getElementById('derivedPublicKeyDisplay').textContent = derivedPublicKey;
+                console.log("Derived Public Key:", derivedPublicKey);
+            } else {
+                console.log("No private key available for testing.");
+            }
+        };
+    </script>
+</body>
+</html>
