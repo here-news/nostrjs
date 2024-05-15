@@ -23,3 +23,12 @@ export async function generateNostrKeyPair() {
         publicKey: publicKeyWithoutPrefix
     };
 }
+
+export async function derivePublicKey(privateKey) {
+
+    const publicKey = nobleSecp256k1.getPublicKey(privateKey, true); // Get compressed public key
+    const publicKeyHex = toHexString(publicKey);
+    const publicKeyWithoutPrefix = publicKeyHex.slice(2);
+    return publicKeyWithoutPrefix;
+
+}
