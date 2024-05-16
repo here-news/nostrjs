@@ -1,4 +1,4 @@
-// nostrKeys.js
+// nostr.js
 
 // Convert Uint8Array to Hex String
 export function toHexString(byteArray) {
