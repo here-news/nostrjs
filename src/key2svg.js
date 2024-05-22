@@ -53,7 +53,7 @@ export function generateSVG(publicKey, svg) {
     const numberOfCurves = 5;
     for (let i = 0; i < numberOfCurves; i++) {
         // Generate path using valid numbers
-        const d = `M${rng.next() * 800},${rng.next() * 600} C${rng.next() * 800},${rng.next() * 600} ${rng.next() * 800},${rng.next() * 600} ${rng.next() * 800},${rng.next() * 600}`;
+        const d = `M${rng.next() * 600},${rng.next() * 600} C${rng.next() * 600},${rng.next() * 600} ${rng.next() * 600},${rng.next() * 600} ${rng.next() * 600},${rng.next() * 600}`;
         // console.log("Path:", d);
         drawBezier(svg, { ...params, d });
     }
